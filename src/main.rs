@@ -6,21 +6,21 @@ fn test_observer(message: String) {
 
 #[tokio::main]
 async fn main() {
-    let streams = create_stream("redis://localhost:6379");
+    let stream = create_stream("redis://localhost:6379");
 
-    let test_channel = streams.create_channel("test_channel".to_string()).await;
+    let test_channel = stream.create_channel("test_channel".to_string()).await;
 
-    let task_1 = streams
+    let task_1 = stream
         .subscribe("test_channel".to_string(), test_observer)
         .await;
 
-    let task_2 = streams
+    let task_2 = stream
         .subscribe("test_channel".to_string(), |message| {
             println!("2 Message recieved: {}", message);
         })
         .await;
 
-    streams
+    stream
         .publish("test_channel".to_string(), "Hello World!".to_string())
         .await;
 
