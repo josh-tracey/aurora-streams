@@ -79,11 +79,15 @@ impl AuroraStreams {
         let handle = tokio::spawn(async move {
             let sleep = tokio::time::sleep(tokio::time::Duration::from_millis(1000));
             tokio::pin!(sleep);
+            let mut previous_message: Option<String> = None;
             loop {
                 tokio::select! {
                     _ = receiver.changed() => {
                         let message = receiver.borrow_and_update();
-                        observer(message.to_string());
+                        if message.to_string() != previous_message.clone().unwrap_or_default() {
+                            observer(message.to_string());
+                        }
+                    previous_message = Some(message.to_string());
                     }
                     _ = &mut sleep => {}
                 }

@@ -13,7 +13,7 @@ async fn main() {
     let streams = Arc::new(AuroraStreams::new(client));
     let a_streams: &'static AuroraStreams = Box::leak(Box::new(streams.clone()));
 
-    let channel_manager = a_streams.create_channel("test_channel".to_string()).await;
+    let test_channel = a_streams.create_channel("test_channel".to_string()).await;
 
     a_streams
         .publish("test_channel".to_string(), "Hello World!".to_string())
@@ -29,7 +29,7 @@ async fn main() {
         })
         .await;
 
-    for handle in vec![channel_manager, task_1, task_2] {
+    for handle in vec![test_channel, task_1, task_2] {
         handle.await.unwrap();
     }
 }
