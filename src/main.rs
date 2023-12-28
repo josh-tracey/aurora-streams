@@ -10,10 +10,6 @@ async fn main() {
 
     let test_channel = streams.create_channel("test_channel".to_string()).await;
 
-    streams
-        .publish("test_channel".to_string(), "Hello World!".to_string())
-        .await;
-
     let task_1 = streams
         .subscribe("test_channel".to_string(), test_observer)
         .await;
@@ -22,6 +18,10 @@ async fn main() {
         .subscribe("test_channel".to_string(), |message| {
             println!("2 Message recieved: {}", message);
         })
+        .await;
+
+    streams
+        .publish("test_channel".to_string(), "Hello World!".to_string())
         .await;
 
     for handle in vec![test_channel, task_1, task_2] {
