@@ -1,6 +1,4 @@
-use std::sync::Arc;
-
-use aurora_streams::AuroraStreams;
+use aurora_streams::create_stream;
 
 fn test_observer(message: String) {
     println!("1 Message recieved: {}", message);
@@ -8,22 +6,19 @@ fn test_observer(message: String) {
 
 #[tokio::main]
 async fn main() {
-    let client = redis::Client::open("redis://localhost:6379").unwrap();
+    let streams = create_stream("redis://localhost:6379");
 
-    let streams = Arc::new(AuroraStreams::new(client));
-    let a_streams: &'static AuroraStreams = Box::leak(Box::new(streams.clone()));
+    let test_channel = streams.create_channel("test_channel".to_string()).await;
 
-    let test_channel = a_streams.create_channel("test_channel".to_string()).await;
-
-    a_streams
+    streams
         .publish("test_channel".to_string(), "Hello World!".to_string())
         .await;
 
-    let task_1 = a_streams
+    let task_1 = streams
         .subscribe("test_channel".to_string(), test_observer)
         .await;
 
-    let task_2 = a_streams
+    let task_2 = streams
         .subscribe("test_channel".to_string(), |message| {
             println!("2 Message recieved: {}", message);
         })
