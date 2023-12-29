@@ -29,10 +29,7 @@ impl AuroraStreams {
         }
     }
 
-    pub async fn create_channel(
-        &'static self,
-        channel_name: String,
-    ) -> tokio::task::JoinHandle<()> {
+    pub async fn create_channel(&'static self, channel_name: String) -> Result<(), String> {
         let channel = Channel::new();
         let mut channels = self.channels.lock().await;
         channels.insert(channel_name.clone(), channel);
@@ -41,11 +38,18 @@ impl AuroraStreams {
             .redis_client
             .get_async_connection()
             .await
-            .unwrap()
+            .or(Err("Failed to connect to redis".to_string()))?
             .into_pubsub();
-        pub_sub.subscribe(channel_name.clone()).await.unwrap();
+        pub_sub
+            .subscribe(channel_name.clone())
+            .await
+            .or(Err(format!(
+                "Failed to subscribe to channel {}",
+                channel_name
+            )
+            .to_string()))?;
 
-        let handle = tokio::spawn(async move {
+        tokio::spawn(async move {
             while let Some(msg) = pub_sub.on_message().next().await {
                 let channel_name = msg.get_channel_name().to_string();
                 let message: String = msg.get_payload().unwrap();
@@ -55,26 +59,37 @@ impl AuroraStreams {
             }
         });
 
-        return handle;
+        return Ok(());
     }
 
-    pub async fn publish(&self, channel_name: String, message: String) {
+    pub async fn publish(&self, channel_name: String, message: String) -> Result<(), String> {
         let channels = self.channels.lock().await;
-        let sender = &channels.get(&channel_name).unwrap().sender;
+        let sender = &channels
+            .get(&channel_name)
+            .ok_or(format!("Channel {} does not exist", channel_name).to_string())?
+            .sender;
         sender.send(message.clone()).unwrap();
         let mut con = self.redis_client.get_async_connection().await.unwrap();
         con.publish::<&str, &str, Value>(&channel_name, &message)
             .await
-            .unwrap();
+            .or(Err(format!(
+                "Failed to publish message {} to channel {}",
+                message, channel_name
+            )))?;
+        Ok(())
     }
 
     pub async fn subscribe<'a>(
         &'a self,
         channel_name: String,
         observer: impl Fn(String) + Send + 'a + 'static,
-    ) -> tokio::task::JoinHandle<()> {
+    ) -> Result<tokio::task::JoinHandle<()>, String> {
         let channels = self.channels.lock().await;
-        let mut receiver = channels.get(&channel_name).unwrap().receiver.clone();
+        let mut receiver = channels
+            .get(&channel_name)
+            .ok_or(format!("Channel {} does not exist", channel_name).to_string())?
+            .receiver
+            .clone();
 
         let handle = tokio::spawn(async move {
             let sleep = tokio::time::sleep(tokio::time::Duration::from_millis(1000));
@@ -94,6 +109,6 @@ impl AuroraStreams {
             }
         });
 
-        return handle;
+        return Ok(handle);
     }
 }
