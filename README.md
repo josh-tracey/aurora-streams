@@ -22,8 +22,8 @@ aurora-streams = "0.1.0"  # Replace with the actual version
 
 Import the library in your Rust code:
 
-```
-rust use aurora_streams::create_stream;
+```rust
+use aurora_streams::create_stream;
 ```
 
 ### Usage:
