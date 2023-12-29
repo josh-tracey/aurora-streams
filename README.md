@@ -32,29 +32,27 @@ use aurora_streams::create_stream;
 #### Create an AuroraStreams instance:
 
 ```rust
-    let streams = create_stream("redis://localhost:6379")
+let streams = create_stream("redis://localhost:6379")
 ```
 
 #### Create a channel:
 
 ```rust
-    streams.create_channel("test_channel".to_string()).await;
+streams.create_channel("test_channel".to_string()).await;
 ```
 
 #### Publish a message:
 
 ```rust
-    streams.publish("test_channel".to_string(), "Hello World!".to_string()).await;
+streams.publish("test_channel".to_string(), "Hello World!".to_string()).await;
 ```
 
 #### Subscribe to a channel:
 
 ```rust
-    streams
-    .subscribe("test_channel".to_string(), |message| {
-        println!("Message received: {}", message);
-    })
-    .await;
+streams.subscribe("test_channel".to_string(), |message| {
+    println!("Message received: {}", message);
+}).await;
 ```
 
 ### License:
