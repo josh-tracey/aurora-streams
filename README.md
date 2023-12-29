@@ -16,8 +16,8 @@ A Rust library for managing publish-subscribe channels for both Redis and local 
 Add the dependency to your Cargo.toml:
 
 ```toml
-    [dependencies]
-    aurora-streams = "0.1.0"  # Replace with the actual version
+[dependencies]
+aurora-streams = "0.1.0"  # Replace with the actual version
 ```
 
 Import the library in your Rust code:
