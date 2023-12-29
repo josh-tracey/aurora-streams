@@ -6,21 +6,25 @@ A Rust library for managing publish-subscribe channels for both Redis and local 
 
 ### Features:
 
-    Simplified Pub/Sub Interaction
-    Asynchronous Operations
-    Duplicate Message Handling
-    Channel Management
+* Simplified Pub/Sub Interaction
+* Asynchronous Operations
+* Duplicate Message Handling
+* Channel Management
 
 ## Getting Started:
 
-    Add the dependency to your Cargo.toml:
+Add the dependency to your Cargo.toml:
 
+```toml
     [dependencies]
     aurora-streams = "0.1.0"  # Replace with the actual version
+```
 
-    Import the library in your Rust code:
+Import the library in your Rust code:
 
-    use aurora_streams::create_stream;
+```
+rust use aurora_streams::create_stream;
+```
 
 ### Usage:
 
