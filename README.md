@@ -20,7 +20,7 @@ A Rust library for managing publish-subscribe channels with Redis.
 
     Import the library in your Rust code:
 
-    use aurora_streams::AuroraStreams;
+    use aurora_streams::create_stream;
 
 ### Usage:
 
@@ -28,9 +28,7 @@ A Rust library for managing publish-subscribe channels with Redis.
 #### Create an AuroraStreams instance:
 
 ```rust
-
-    let client = redis::Client::open("redis://localhost:6379").unwrap();
-    let streams = AuroraStreams::new(client);
+    let streams = create_stream("redis://localhost:6379")
 ```
 
 #### Create a channel:
@@ -50,7 +48,7 @@ A Rust library for managing publish-subscribe channels with Redis.
 ```rust
     streams
     .subscribe("test_channel".to_string(), |message| {
-    println!("Message received: {}", message);
+        println!("Message received: {}", message);
     })
     .await;
 ```
