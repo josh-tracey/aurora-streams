@@ -1,4 +1,7 @@
+#[cfg(feature = "event-routing")]
 use futures_util::StreamExt;
+
+#[cfg(feature = "event-routing")]
 use redis::{AsyncCommands, Client, Value};
 use std::collections::HashMap;
 use tokio::sync::watch::{self, channel};
@@ -18,13 +21,15 @@ impl Channel {
 
 pub struct AuroraStreams {
     channels: Mutex<HashMap<String, Channel>>,
+    #[cfg(feature = "event-routing")]
     redis_client: Client,
 }
 
 impl AuroraStreams {
-    pub fn new(redis_client: Client) -> Self {
+    pub fn new(#[cfg(feature = "event-routing")] redis_client: Client) -> Self {
         Self {
             channels: Mutex::new(HashMap::<String, Channel>::new()),
+            #[cfg(feature = "event-routing")]
             redis_client,
         }
     }
@@ -34,12 +39,14 @@ impl AuroraStreams {
         let mut channels = self.channels.lock().await;
         channels.insert(channel_name.clone(), channel);
 
+        #[cfg(feature = "event-routing")]
         let mut pub_sub = self
             .redis_client
             .get_async_connection()
             .await
             .or(Err("Failed to connect to redis".to_string()))?
             .into_pubsub();
+        #[cfg(feature = "event-routing")]
         pub_sub
             .subscribe(channel_name.clone())
             .await
@@ -48,7 +55,7 @@ impl AuroraStreams {
                 channel_name
             )
             .to_string()))?;
-
+        #[cfg(feature = "event-routing")]
         tokio::spawn(async move {
             while let Some(msg) = pub_sub.on_message().next().await {
                 let channel_name = msg.get_channel_name().to_string();
@@ -69,7 +76,9 @@ impl AuroraStreams {
             .ok_or(format!("Channel {} does not exist", channel_name).to_string())?
             .sender;
         sender.send(message.clone()).unwrap();
+        #[cfg(feature = "event-routing")]
         let mut con = self.redis_client.get_async_connection().await.unwrap();
+        #[cfg(feature = "event-routing")]
         con.publish::<&str, &str, Value>(&channel_name, &message)
             .await
             .or(Err(format!(
