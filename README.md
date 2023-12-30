@@ -2,11 +2,9 @@
 
 [![Rust](https://github.com/josh-tracey/aurora-streams/actions/workflows/rust.yml/badge.svg)](https://github.com/josh-tracey/aurora-streams/actions/workflows/rust.yml)
 
-A Rust library for managing publish-subscribe channels using Tokio messages passing channels.
+A Rust library for managing publish-subscribe channels using Tokio message passing channels.
 
-optionally event routing can be enabled using redis by passing the `event-routing` feature flag.
-
-this allows pub-sub messages to be shared between multiple services.
+Optionally remote event routing can be enabled using redis by passing the `event-routing` feature flag, This allows pub-sub messages to be shared between multiple services.
 
 ### Features:
 
@@ -33,25 +31,31 @@ use aurora_streams::create_stream;
 ### Usage:
 
 
-#### Create an AuroraStreams instance:
+Create an AuroraStreams instance:
 
 ```rust
 let streams = create_stream()
 ```
 
-#### Create a channel:
+Create an AuroraStreams instance if **event routing** is enabled:
+
+```rust
+let streams = create_stream("redis://127.0.0.1:6387")
+```
+
+Create a channel:
 
 ```rust
 streams.create_channel("test_channel".to_string()).await;
 ```
 
-#### Publish a message:
+Publish a message:
 
 ```rust
 streams.publish("test_channel".to_string(), "Hello World!".to_string()).await;
 ```
 
-#### Subscribe to a channel:
+Subscribe to a channel:
 
 ```rust
 streams.subscribe("test_channel".to_string(), |message| {
