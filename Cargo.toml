@@ -7,5 +7,9 @@ edition = "2021"
 
 [dependencies]
 futures-util = "0.3.29"
-redis = { version="0.24.0", features=["tokio-comp"] }
+redis = { version="0.24.0", features=["tokio-comp"], optional = true }
 tokio = { version= "1.35.0", features=["full"] }
+
+[features]
+default = []
+event-routing = ["redis"]
