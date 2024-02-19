@@ -1,6 +1,6 @@
 [package]
 name = "aurora-streams"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 description = "library for managing publish-subscribe channels using Tokio message passing channels."
 license = "MIT"
