@@ -91,7 +91,7 @@ impl AuroraStreams {
     pub async fn subscribe<'a>(
         &'a self,
         channel_name: String,
-        observer: impl Fn(String) + Send + 'a + 'static,
+        observer: impl Observer + Send + 'a + 'static,
     ) -> Result<tokio::task::JoinHandle<()>, String> {
         let channels = self.channels.lock().await;
         let mut receiver = channels
@@ -109,7 +109,7 @@ impl AuroraStreams {
                     _ = receiver.changed() => {
                         let message = receiver.borrow_and_update();
                         if message.to_string() != previous_message.clone().unwrap_or_default() {
-                            observer(message.to_string());
+                            observer.on_message(message.to_string());
                         }
                     previous_message = Some(message.to_string());
                     }
@@ -120,4 +120,8 @@ impl AuroraStreams {
 
         return Ok(handle);
     }
+}
+
+pub trait Observer {
+    fn on_message(&self, message: String);
 }
