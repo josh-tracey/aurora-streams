@@ -58,9 +58,17 @@ streams.publish("test_channel".to_string(), "Hello World!".to_string()).await;
 Subscribe to a channel:
 
 ```rust
-streams.subscribe("test_channel".to_string(), |message| {
-    println!("Message received: {}", message);
-}).await;
+struct MySubscriber;
+
+impl Observer for MySubscriber {
+    fn on_message(&self, message: String) {
+        println!("Received message: {}", message);
+    }
+}
+
+streams
+    .subscribe("test_channel".to_string(), MySubscriber)
+    .await;
 ```
 
 ### License:
