@@ -9,13 +9,12 @@ use tokio::sync::Mutex;
 
 pub struct Channel {
     pub sender: watch::Sender<String>,
-    pub receiver: watch::Receiver<String>,
 }
 
 impl Channel {
     pub fn new() -> Self {
-        let (sender, receiver) = channel(String::new());
-        Self { sender, receiver }
+        let (sender, _) = channel(String::new());
+        Self { sender }
     }
 }
 
@@ -94,11 +93,12 @@ impl AuroraStreams {
         observer: impl Observer + Send + 'a + 'static,
     ) -> Result<tokio::task::JoinHandle<()>, String> {
         let channels = self.channels.lock().await;
-        let mut receiver = channels
+        let sender = &channels
             .get(&channel_name)
             .ok_or(format!("Channel {} does not exist", channel_name).to_string())?
-            .receiver
-            .clone();
+            .sender;
+        // Create a new receiver for this subscription
+        let mut receiver = sender.subscribe();
 
         let handle = tokio::spawn(async move {
             let sleep = tokio::time::sleep(tokio::time::Duration::from_millis(1000));
@@ -111,7 +111,7 @@ impl AuroraStreams {
                         if message.to_string() != previous_message.clone().unwrap_or_default() {
                             observer.on_message(message.to_string());
                         }
-                    previous_message = Some(message.to_string());
+                        previous_message = Some(message.to_string());
                     }
                     _ = &mut sleep => {}
                 }
