@@ -14,4 +14,4 @@ tokio = { version = "1.35.0", features = ["full"] }
 
 [features]
 default = []
-event_routing = ["redis"]
+event-routing = ["redis"]
