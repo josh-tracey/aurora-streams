@@ -12,7 +12,7 @@ impl Observer for MySubscriber {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let stream = create_stream("redis://127.0.0.1").unwrap();
+    let stream = create_stream().unwrap();
 
     stream.create_channel(CHANNEL_NAME.to_string()).await?;
 
