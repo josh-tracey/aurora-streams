@@ -41,10 +41,9 @@ impl AuroraStreams {
         #[cfg(feature = "event-routing")]
         let mut pub_sub = self
             .redis_client
-            .get_async_connection()
+            .get_async_pubsub()
             .await
-            .or(Err("Failed to connect to redis".to_string()))?
-            .into_pubsub();
+            .or(Err("Failed to connect to redis".to_string()))?;
         #[cfg(feature = "event-routing")]
         pub_sub
             .subscribe(channel_name.clone())
@@ -76,14 +75,22 @@ impl AuroraStreams {
             .sender;
         sender.send(message.clone()).unwrap();
         #[cfg(feature = "event-routing")]
-        let mut con = self.redis_client.get_async_connection().await.unwrap();
-        #[cfg(feature = "event-routing")]
-        con.publish::<&str, &str, Value>(&channel_name, &message)
-            .await
-            .or(Err(format!(
-                "Failed to publish message {} to channel {}",
-                message, channel_name
-            )))?;
+        {
+            let mut con = self
+                .redis_client
+                .get_multiplexed_tokio_connection()
+                .await
+                .map_err(|e| format!("Failed to connect to redis: {}", e))?;
+
+            con.publish::<&str, &str, Value>(&channel_name, &message)
+                .await
+                .map_err(|e| {
+                    format!(
+                        "Failed to publish message {} to channel {}: {}",
+                        message, channel_name, e
+                    )
+                })?;
+        }
         Ok(())
     }
 
