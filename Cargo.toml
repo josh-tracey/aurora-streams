@@ -13,5 +13,5 @@ redis = { version = "0.26", features = ["tokio-comp"], optional = true }
 tokio = { version = "~1", features = ["full"] }
 
 [features]
-default = ["event-routing"]
+default = []
 event-routing = ["redis"]
