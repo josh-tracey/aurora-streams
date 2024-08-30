@@ -4,6 +4,7 @@ use futures_util::StreamExt;
 #[cfg(feature = "event-routing")]
 use redis::{AsyncCommands, Client, Value};
 use std::collections::HashMap;
+use std::sync::Arc;
 use tokio::sync::watch::{self, channel};
 use tokio::sync::Mutex;
 
@@ -18,8 +19,9 @@ impl Channel {
     }
 }
 
+#[derive(Clone)]
 pub struct AuroraStreams {
-    channels: Mutex<HashMap<String, Channel>>,
+    channels: Arc<Mutex<HashMap<String, Channel>>>,
     #[cfg(feature = "event-routing")]
     redis_client: Client,
 }
@@ -27,7 +29,7 @@ pub struct AuroraStreams {
 impl AuroraStreams {
     pub fn new(#[cfg(feature = "event-routing")] redis_client: Client) -> Self {
         Self {
-            channels: Mutex::new(HashMap::<String, Channel>::new()),
+            channels: Arc::new(Mutex::new(HashMap::<String, Channel>::new())),
             #[cfg(feature = "event-routing")]
             redis_client,
         }
