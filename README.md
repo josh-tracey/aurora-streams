@@ -10,6 +10,7 @@ Build scalable asynchronous applications with ease. Aurora Streams provides a li
 * **Efficient:** Leverage Tokio for high-performance asynchronous communication.
 * **Flexible:**  Easily create and manage multiple channels for diverse needs.
 * **Seamless:** Built-in serialization with Serde simplifies data handling.
+* **Decoupled:** Communicate between threads reliably without tight coupling.
 
 ## Getting Started
 
