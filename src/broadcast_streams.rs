@@ -73,20 +73,6 @@ impl AuroraBroadcastStreams {
         channel_name: &str,
         message: &str,
     ) -> Result<(), AuroraBroadcastError> {
-        {
-            let channels = self.channels.lock().await;
-            if let Some(channel) = channels.get(channel_name) {
-                channel
-                    .sender
-                    .send(message.to_string())
-                    .map_err(|e| AuroraBroadcastError::SendError(e.to_string()))?;
-            } else {
-                return Err(AuroraBroadcastError::ChannelNotFound(
-                    channel_name.to_string(),
-                ));
-            }
-        }
-
         self.backend
             .publish(channel_name, message)
             .await
