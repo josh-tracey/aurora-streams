@@ -1,11 +1,14 @@
-// src/lib.rs
-
+pub mod aurora_streams;
 pub mod backend;
-pub mod broadcast_streams;
 pub mod errors;
-pub mod watch_streams;
 
+use std::sync::Arc;
+
+pub use aurora_streams::AuroraStreams;
 pub use backend::{InMemoryBackend, MessageStream, PubSubBackend};
-pub use broadcast_streams::AuroraBroadcastStreams;
 pub use errors::{AuroraBroadcastError, AuroraWatchError};
-pub use watch_streams::AuroraWatchStreams;
+
+pub fn create_streams() -> Arc<AuroraStreams> {
+    let backend = Arc::new(InMemoryBackend::new());
+    Arc::new(AuroraStreams::new(backend))
+}

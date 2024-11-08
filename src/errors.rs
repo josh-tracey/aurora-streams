@@ -1,27 +1,25 @@
 use thiserror::Error;
 
-/// Error type for AuroraBroadcastStreams.
 #[derive(Error, Debug)]
 pub enum AuroraBroadcastError {
-    #[error("PubSub error: {0}")]
-    PubSubError(String),
-
-    #[error("Channel '{0}' does not exist")]
+    #[error("Channel not found: {0}")]
     ChannelNotFound(String),
 
-    #[error("Failed to send message: {0}")]
-    SendError(String),
+    #[error("Type mismatch for channel: {0}")]
+    TypeMismatch(String),
+
+    #[error("PubSub error: {0}")]
+    PubSubError(String),
 }
 
-/// Error type for AuroraWatchStreams.
 #[derive(Error, Debug)]
 pub enum AuroraWatchError {
-    #[error("PubSub error: {0}")]
-    PubSubError(String),
-
-    #[error("Channel '{0}' does not exist")]
+    #[error("Channel not found: {0}")]
     ChannelNotFound(String),
 
-    #[error("Failed to send message: {0}")]
-    SendError(String),
+    #[error("Type mismatch for channel: {0}")]
+    TypeMismatch(String),
+
+    #[error("PubSub error: {0}")]
+    PubSubError(String),
 }
