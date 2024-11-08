@@ -1,42 +1,19 @@
-# Aurora Streams
+# Aurora Streams: Simple, Type-Safe Async Messaging in Rust
 
 [![Rust](https://github.com/josh-tracey/aurora-streams/actions/workflows/rust.yml/badge.svg)](https://github.com/josh-tracey/aurora-streams/actions/workflows/rust.yml)
 
-**Aurora Streams** is a **Rust library** designed to simplify the management of **publish-subscribe (Pub/Sub)** channels using **Tokio's** asynchronous message-passing capabilities. It offers **type-safe**, **asynchronous**, and **flexible** communication channels, making it easier to build robust and scalable applications.
+Build scalable asynchronous applications with ease. Aurora Streams provides a lightweight, Tokio-based solution for managing publish-subscribe channels in Rust. 
 
----
-## 📋 Table of Contents
+**Benefits:**
 
-1. [Features](#features)
-2. [Getting Started](#getting-started)
-   - [Installation](#installation)
-   - [Importing the Library](#importing-the-library)
-3. [Usage](#usage)
-   - [Creating an AuroraStreams Instance](#creating-an-aurorastreams-instance)
-     - [Using In-Memory Backend](#using-in-memory-backend)
-   - [Defining Message Types](#defining-message-types)
-   - [Creating Channels](#creating-channels)
-   - [Publishing Messages](#publishing-messages)
-   - [Subscribing to Channels](#subscribing-to-channels)
-4. [Advanced Usage](#advanced-usage)
-   - [Handling Multiple Message Types](#handling-multiple-message-types)
-5. [License](#license)
-6. [Contributing](#contributing)
-7. [Contact](#contact)
+* **Type-safe:** Eliminate runtime errors with compile-time message type validation.
+* **Efficient:** Leverage Tokio for high-performance asynchronous communication.
+* **Flexible:**  Easily create and manage multiple channels for diverse needs.
+* **Seamless:** Built-in serialization with Serde simplifies data handling.
 
----
-## 🎉 Features
+## Getting Started
 
-- **Type-Safe Pub/Sub Interaction**: Define channels with specific message types, ensuring compile-time type safety.
-- **Asynchronous Operations**: Utilize Tokio for efficient asynchronous task handling and message processing.
-- **Channel Management**: Easily create, publish to, and subscribe from multiple channels.
-- **Flexible Backend Support**: Choose between in-memory backend for local communication.
-- **Serialization Support**: Leverage Serde for seamless serialization and deserialization of messages.
-
----
-## 🚀 Getting Started
-
-### 🛠 Installation
+### Installation
 
 Add Aurora Streams to your `Cargo.toml`:
 
