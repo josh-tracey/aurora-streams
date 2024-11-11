@@ -48,10 +48,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .await?;
 
-    // Subscribe to "flight_style" channel
     let handle_flight_style = streams
-        .subscribe("flight_style", move |flight_style: FlightStyle| {
-            println!("Received Flight Style: {:?}", flight_style);
+        .subscribe_async("flight_style", |flight_style: FlightStyle| {
+            Box::pin(async move {
+                println!("Received Flight Style: {:?}", flight_style);
+
+                // Simulate async computation
+                tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+
+                println!("Flight Style processed successfully.")
+            })
         })
         .await?;
 

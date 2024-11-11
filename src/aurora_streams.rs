@@ -83,6 +83,40 @@ impl AuroraStreams {
             Err(AuroraBroadcastError::TypeMismatch(channel_name.to_string()))
         }
     }
+
+    pub async fn subscribe_async<T, F>(
+        &self,
+        channel_name: &str,
+        callback: F,
+    ) -> Result<JoinHandle<()>, AuroraBroadcastError>
+    where
+        T: Serialize + DeserializeOwned + Clone + Send + Sync + 'static,
+        F: FnMut(T) -> std::pin::Pin<Box<dyn std::future::Future<Output = ()> + Send>>
+            + Send
+            + 'static,
+    {
+        let channels = self.channels.lock().await;
+        let channel = channels
+            .get(channel_name)
+            .ok_or_else(|| AuroraBroadcastError::ChannelNotFound(channel_name.to_string()))?;
+        if let Some(typed_channel) = channel.downcast_ref::<TypedChannel<T>>() {
+            let callback = Arc::new(Mutex::new(callback));
+            let callback_clone = Arc::clone(&callback);
+            let handle = typed_channel
+                .subscribe(move |msg| {
+                    let callback = callback_clone.clone();
+                    tokio::spawn(async move {
+                        let mut callback = callback.lock().await;
+                        callback(msg).await;
+                    });
+                })
+                .await
+                .unwrap();
+            Ok(handle)
+        } else {
+            Err(AuroraBroadcastError::TypeMismatch(channel_name.to_string()))
+        }
+    }
 }
 
 pub struct TypedChannel<T>
