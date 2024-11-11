@@ -1,18 +1,14 @@
-use std::{error::Error, sync::Arc};
+pub mod aurora_streams;
+pub mod backend;
+pub mod errors;
 
-use aurora::AuroraStreams;
+use std::sync::Arc;
 
-pub mod aurora;
+pub use aurora_streams::AuroraStreams;
+pub use backend::{InMemoryBackend, MessageStream, PubSubBackend};
+pub use errors::{AuroraBroadcastError, AuroraWatchError};
 
-pub fn create_stream(
-    #[cfg(feature = "event-routing")] url: &str,
-) -> Result<&'static AuroraStreams, Box<dyn Error>> {
-    #[cfg(feature = "event-routing")]
-    let client = redis::Client::open(url)?;
-    let streams = Arc::new(AuroraStreams::new(
-        #[cfg(feature = "event-routing")]
-        client,
-    ));
-    let a_streams: &'static AuroraStreams = Box::leak(Box::new(streams.clone()));
-    Ok(a_streams)
+pub fn create_streams() -> Arc<AuroraStreams> {
+    let backend = Arc::new(InMemoryBackend::new());
+    Arc::new(AuroraStreams::new(backend))
 }
